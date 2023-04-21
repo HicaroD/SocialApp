@@ -14,7 +14,7 @@ def create_user(user: User):
     pass
 
 @app.get("/users/{username}/followers")
-def get_all_followers_of_user(username: str):
+def get_all_user_followers(username: str):
     # TODO: query database to get all users that user with username follows
     pass
 
