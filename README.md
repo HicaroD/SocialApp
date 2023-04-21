@@ -5,6 +5,8 @@ SocialApp é um aplicativo mobile simples que possui o intuito de simular uma re
 A ideia é fazer a utilização de grafos com o auxílio do [Neo4J](https://neo4j.com/) para armazenar os usuários e as relações
 entre eles. O usuário terá a possibilidade de dar follow e unfollow em outro usuário.
 
+Esse projeto está sendo feita para avaliação da AB2 de Teoria dos Grafos.
+
 ## Tecnologias utilizadas
 
 - Flutter para desenvolvimento do aplicativo mobile
