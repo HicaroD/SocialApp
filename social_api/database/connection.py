@@ -13,6 +13,9 @@ class SocialAppDatabase:
     def create_user(self, user: User):
         return self._query_write(CypherCommands.get_create_user_command(user))
 
+    def get_all_following_users(self, username: str):
+        return self._query_read(CypherCommands.get_all_following_users(username))
+
     def get_all_users_followers(self, username: str):
         return self._query_read(
             CypherCommands.get_all_users_followers_command(username)

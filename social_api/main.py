@@ -3,28 +3,39 @@ from models.user import User
 
 app = FastAPI()
 
+
 @app.get("/users")
 def get_all_registered_users():
     # TODO: query database to get all registered users
     pass
+
 
 @app.post("/users")
 def create_user(user: User):
     # TODO: add new user to Neo4J database
     pass
 
+
+@app.get("/users/{username}/following")
+def get_all_following_users(username: str):
+    # TODO: query database to get all following users
+    pass
+
+
 @app.get("/users/{username}/followers")
 def get_all_user_followers(username: str):
-    # TODO: query database to get all users that user with username follows
+    # TODO: query database to get all users followers
     pass
+
 
 @app.post("/users/{first_username}/follow/{second_username}")
 def follow(first_username: str, second_username: str):
     # TODO: query database to build a relationship between first username and second username
     pass
 
+
 @app.post("/users/{first_username}/unfollow/{second_username}")
 def unfollow(first_username: str, second_username: str):
-    # TODO: query database to remove (if exists) a relationship between first username and 
+    # TODO: query database to remove (if exists) a relationship between first username and
     # second username
     pass
