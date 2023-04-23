@@ -1,5 +1,8 @@
 from models.user import User
 
+# TODO(REFACTOR): lines are too big!
+# I'll be using a OGM for Neo4J in order to simplify all queries
+
 
 class CypherCommands:
     @staticmethod
@@ -9,10 +12,12 @@ class CypherCommands:
     @staticmethod
     def get_create_user_command(user: User):
         name = user.name
-        age = user.birthdate
-        description = user.description
+        username = user.username
+        birthdate = user.birthdate
+        description = "" if user.description is None else user.description
+        profile_picture = "" if user.profile_picture is None else user.profile_picture
 
-        return f"""MERGE (user: User {{name: "{name}", age: "{age}", description: "{description}"}})"""
+        return f"""MERGE (user: User {{username: "{username}", name: "{name}", "birthdate: "{birthdate}", description: "{description}", profile_picture: "{profile_picture}"}})"""
 
     @staticmethod
     def get_all_following_users(username: str):

@@ -1,6 +1,6 @@
 from neo4j import GraphDatabase
 from models.user import User
-from database.commands import CypherCommands
+from database.neo4j.commands import CypherCommands
 
 
 class SocialAppDatabase:
