@@ -7,6 +7,8 @@ from fastapi import Depends, FastAPI, HTTPException
 from database.connection import SocialAppDatabase
 from models.user import User
 
+import uvicorn
+
 CONFIG = dotenv_values(".environment")
 
 app = FastAPI()
@@ -96,3 +98,7 @@ def unfollow(
         return {"detail": f"{first_username} unfollowed {second_username}"}
     except Exception:
         raise HTTPException(status_code=500, detail="An error ocurred")
+
+
+if __name__ == "__main__":
+    uvicorn.run(app=app)

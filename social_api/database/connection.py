@@ -56,14 +56,14 @@ def main() -> None:
         User(
             name="hicaro",
             description="My name is Hícaro and I like Counter Strike",
-            birthdate=19,
+            age=19,
         )
     )
     database.create_user(
         User(
             name="alice",
             description="My name is Alice and I like Valorant",
-            birthdate=19,
+            age=19,
         )
     )
     database.follow_user("alice", "hicaro")

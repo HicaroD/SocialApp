@@ -9,7 +9,7 @@ class CypherCommands:
     @staticmethod
     def get_create_user_command(user: User):
         name = user.name
-        age = user.birthdate
+        age = user.age
         description = user.description
 
         return f"""MERGE (user: User {{name: "{name}", age: "{age}", description: "{description}"}})"""
