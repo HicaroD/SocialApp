@@ -1,72 +1,60 @@
-import os
 from typing import Generator
 
-from dotenv import dotenv_values
+import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
 
-from database.connection import SocialAppDatabase
-from models.user import User
-
-import uvicorn
-
-CONFIG = dotenv_values(".environment")
+from database.graph.repository import UserGraphRepository
+from schemas.user import User
 
 app = FastAPI()
 
 
-def get_graph_database() -> Generator[SocialAppDatabase, None, None]:
-    try:
-        database = SocialAppDatabase(
-            CONFIG["NEO4J_URL"],
-            CONFIG["NEO4J_USERNAME"],
-            CONFIG["NEO4J_PASSWORD"],
-        )
-        yield database
-    finally:
-        database.close()
+def get_graph_database() -> Generator[UserGraphRepository, None, None]:
+    database = UserGraphRepository()
+    yield database
 
 
 # TODO(refactor): the whole API design could be improved
-# Unnecessary code repetition
+# Unnecessary code repetition, bad error handling
 
 
 @app.get("/users")
 def get_all_registered_users(
-    database: SocialAppDatabase = Depends(get_graph_database),
+    database: UserGraphRepository = Depends(get_graph_database),
 ):
     try:
         return database.get_all_users()
-    except Exception:
-        raise HTTPException(status_code=500, detail="An error ocurred")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{e}")
 
 
 @app.post("/users", status_code=201)
 def create_user(
     user: User,
-    database: SocialAppDatabase = Depends(get_graph_database),
+    database: UserGraphRepository = Depends(get_graph_database),
 ):
     try:
-        database.create_user(user)
-        return {"detail": "User created successfully"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="An error ocurred")
+        new_user = database.create_user(user)
+        return {"detail": "User created successfully", "user": new_user}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{e}")
 
 
 @app.get("/users/{username}/following")
 def get_all_following_users(
     username: str,
-    database: SocialAppDatabase = Depends(get_graph_database),
+    database: UserGraphRepository = Depends(get_graph_database),
 ):
     try:
         return database.get_all_following_users(username)
-    except Exception:
-        raise HTTPException(status_code=500, detail="An error ocurred")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{e}")
 
 
 @app.get("/users/{username}/followers")
 def get_all_user_followers(
     username: str,
-    database: SocialAppDatabase = Depends(get_graph_database),
+    database: UserGraphRepository = Depends(get_graph_database),
 ):
     try:
         return database.get_all_users_followers(username)
@@ -78,7 +66,7 @@ def get_all_user_followers(
 def follow(
     first_username: str,
     second_username: str,
-    database: SocialAppDatabase = Depends(get_graph_database),
+    database: UserGraphRepository = Depends(get_graph_database),
 ):
     try:
         database.follow_user(first_username, second_username)
@@ -91,7 +79,7 @@ def follow(
 def unfollow(
     first_username: str,
     second_username: str,
-    database: SocialAppDatabase = Depends(get_graph_database),
+    database: UserGraphRepository = Depends(get_graph_database),
 ):
     try:
         database.unfollow_user(first_username, second_username)
@@ -101,4 +89,4 @@ def unfollow(
 
 
 if __name__ == "__main__":
-    uvicorn.run(app=app)
+    uvicorn.run("main:app", reload=True)
