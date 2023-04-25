@@ -13,11 +13,11 @@ class CypherCommands:
     def get_create_user_command(user: User):
         name = user.name
         username = user.username
-        birthdate = user.birthdate
+        age = user.age
         description = "" if user.description is None else user.description
         profile_picture = "" if user.profile_picture is None else user.profile_picture
 
-        return f"""MERGE (user: User {{username: "{username}", name: "{name}", "birthdate: "{birthdate}", description: "{description}", profile_picture: "{profile_picture}"}})"""
+        return f"""MERGE (user: User {{username: "{username}", name: "{name}", "age: "{age}", description: "{description}", profile_picture: "{profile_picture}"}})"""
 
     @staticmethod
     def get_all_following_users(username: str):
