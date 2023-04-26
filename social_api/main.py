@@ -2,6 +2,7 @@ from typing import Generator
 
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
+from database.errors.graph import UserAlreadyExists, UserNotFound
 
 from database.graph.repository import UserGraphRepository
 from schemas.user import User
@@ -18,14 +19,14 @@ def get_graph_database() -> Generator[UserGraphRepository, None, None]:
 # Unnecessary code repetition, bad error handling
 
 
-@app.get("/users")
+@app.get("/users", response_model=list[str])
 def get_all_registered_users(
     database: UserGraphRepository = Depends(get_graph_database),
 ):
     try:
         return database.get_all_users()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e}")
+        raise HTTPException(status_code=500, detail=e)
 
 
 @app.post("/users", status_code=201)
@@ -36,8 +37,16 @@ def create_user(
     try:
         new_user = database.create_user(user)
         return {"detail": "User created successfully", "user": new_user}
+    except UserAlreadyExists as e:
+        raise HTTPException(status_code=400, detail=f"{e.args[0]}")
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=f"{e.args[0]}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e}")
+        raise HTTPException(status_code=500, detail=f"{e.message}")
+
+
+# TODO: update user
+# TODO: delete user
 
 
 @app.get("/users/{username}/following")
@@ -57,9 +66,9 @@ def get_all_user_followers(
     database: UserGraphRepository = Depends(get_graph_database),
 ):
     try:
-        return database.get_all_users_followers(username)
-    except Exception:
-        raise HTTPException(status_code=500, detail="An error ocurred")
+        return database.get_all_user_followers(username)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{e.message}")
 
 
 @app.post("/users/{first_username}/follow/{second_username}")
@@ -71,8 +80,10 @@ def follow(
     try:
         database.follow_user(first_username, second_username)
         return {"detail": f"{first_username} is following {second_username}"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="An error ocurred")
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=f"{e.args[0]}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{e.message}")
 
 
 @app.post("/users/{first_username}/unfollow/{second_username}")
@@ -84,8 +95,10 @@ def unfollow(
     try:
         database.unfollow_user(first_username, second_username)
         return {"detail": f"{first_username} unfollowed {second_username}"}
-    except Exception:
-        raise HTTPException(status_code=500, detail="An error ocurred")
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=f"{e.args[0]}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"{e.message}")
 
 
 if __name__ == "__main__":
