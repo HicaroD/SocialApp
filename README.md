@@ -11,7 +11,10 @@ Esse projeto está sendo feita para avaliação da AB2 de Teoria dos Grafos.
 
 - Flutter para desenvolvimento do aplicativo mobile
 - Python com FastAPI para criação de uma API para interagir com o banco de dados Neo4J.
-- Docker para criar um container para o banco de dados Neo4J.
+- Neo4J como banco de dados baseado em grafos para armazenar as informações a respeito de followers e blocks.
+- MySQL como banco de dados relacional para armazenar quaisquer outros tipos de informações a respeito do usuário,
+  feed e etc.
+- Docker para criar containers para Neo4J e MySQL.
 
 ## Estratégia utilizada
 
