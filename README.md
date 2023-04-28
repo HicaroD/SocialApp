@@ -15,6 +15,7 @@ Esse projeto está sendo feita para avaliação da AB2 de Teoria dos Grafos.
 - MySQL como banco de dados relacional para armazenar quaisquer outros tipos de informações a respeito do usuário,
   feed e etc.
 - Docker para criar containers para Neo4J e MySQL.
+- Bash para automatização de comandos do Docker e outros
 
 ## Estratégia utilizada
 
