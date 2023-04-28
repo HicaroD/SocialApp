@@ -42,7 +42,7 @@ def create_user(
     except UserNotFound as e:
         raise HTTPException(status_code=404, detail=f"{e.args[0]}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e.message}")
+        raise HTTPException(status_code=500, detail=f"{e}")
 
 
 # TODO: update user
@@ -68,7 +68,7 @@ def get_all_user_followers(
     try:
         return database.get_all_user_followers(username)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e.message}")
+        raise HTTPException(status_code=500, detail=f"{e}")
 
 
 @app.post("/users/{first_username}/follow/{second_username}")
@@ -83,7 +83,7 @@ def follow(
     except UserNotFound as e:
         raise HTTPException(status_code=404, detail=f"{e.args[0]}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e.message}")
+        raise HTTPException(status_code=500, detail=f"{e}")
 
 
 @app.post("/users/{first_username}/unfollow/{second_username}")
@@ -98,7 +98,7 @@ def unfollow(
     except UserNotFound as e:
         raise HTTPException(status_code=404, detail=f"{e.args[0]}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e.message}")
+        raise HTTPException(status_code=500, detail=f"{e}")
 
 
 if __name__ == "__main__":

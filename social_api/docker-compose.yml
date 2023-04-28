@@ -1,22 +1,42 @@
 version: "3.9"
 services:
-  api:
+  api_container:
     build: .
     ports:
       - "8000:8000"
     environment:
-      - NEO4J_BOLT_URL="bolt://neo4j:password@localhost:7687"
+      NEO4J_BOLT_URL: bolt://neo4j:hicaropassword@neo4j_container:7687
     depends_on:
-      - neo4j
-      - mysql
-  neo4j:
+      - neo4j_container
+      - mysql_container
+    networks:
+      - social_app_network
+  neo4j_container:
     image: "neo4j"
     ports:
       - "7474:7474"
       - "7687:7687"
-  mysql:
-    image: "mysql"
+    environment:
+      NEO4J_AUTH: neo4j/hicaropassword
+    volumes:
+      - neo4j-data:/data
+    networks:
+      - social_app_network
+  mysql_container:
+    image: "mysql:latest"
     ports:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - social_app_network
+
+volumes:
+  neo4j-data:
+  mysql-data:
+
+
+networks:
+  social_app_network:
