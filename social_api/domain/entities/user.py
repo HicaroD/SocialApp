@@ -1,0 +1,2 @@
+class UserEntity:
+    username: str
