@@ -4,12 +4,10 @@ import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
 
 from app.schemas.user import User
+from datasources.errors.graph import UserAlreadyExists, UserNotFound
 from datasources.user_datasource import UserDatasource
-from domain.repositories.user_repository import (
-    UserAlreadyExists,
-    UserNotFound,
-    UserRepository,
-)
+from domain.entities.user import UserEntity
+from domain.repositories.user_repository import UserRepository
 
 app = FastAPI()
 
@@ -18,10 +16,6 @@ def get_graph_database() -> Generator[UserRepository, None, None]:
     user_datasource = UserDatasource()
     database = UserRepository(user_datasource)
     yield database
-
-
-# TODO(refactor): the whole API design could be improved
-# Unnecessary code repetition, bad error handling
 
 
 @app.get("/users", response_model=list[str])
@@ -40,14 +34,14 @@ def create_user(
     database: UserRepository = Depends(get_graph_database),
 ):
     try:
-        new_user = database.create_user(user)
+        new_user = database.create_user(UserEntity(user.username))
         return {"detail": "User created successfully", "user": new_user}
     except UserAlreadyExists as e:
-        raise HTTPException(status_code=400, detail=f"{e.args[0]}")
+        raise HTTPException(status_code=400, detail=e.args[0])
     except UserNotFound as e:
-        raise HTTPException(status_code=404, detail=f"{e.args[0]}")
+        raise HTTPException(status_code=404, detail=e.args[0])
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e}")
+        raise HTTPException(status_code=500, detail=e)
 
 
 # TODO: update user
@@ -60,9 +54,10 @@ def get_all_following_users(
     database: UserRepository = Depends(get_graph_database),
 ):
     try:
-        return database.get_all_following_users(username)
+        user = UserEntity(username)
+        return database.get_all_following_users(user)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e}")
+        raise HTTPException(status_code=500, detail=e)
 
 
 @app.get("/users/{username}/followers")
@@ -71,9 +66,12 @@ def get_all_user_followers(
     database: UserRepository = Depends(get_graph_database),
 ):
     try:
-        return database.get_all_user_followers(username)
+        user = UserEntity(username)
+        return database.get_all_user_followers(user)
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.args[0])
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e}")
+        raise HTTPException(status_code=500, detail=e)
 
 
 @app.post("/users/{first_username}/follow/{second_username}")
@@ -83,12 +81,14 @@ def follow(
     database: UserRepository = Depends(get_graph_database),
 ):
     try:
-        database.follow_user(first_username, second_username)
+        first_user = UserEntity(first_username)
+        second_user = UserEntity(second_username)
+        database.follow_user(first_user, second_user)
         return {"detail": f"{first_username} is following {second_username}"}
     except UserNotFound as e:
-        raise HTTPException(status_code=404, detail=f"{e.args[0]}")
+        raise HTTPException(status_code=404, detail=e.args[0])
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e}")
+        raise HTTPException(status_code=500, detail=e)
 
 
 @app.post("/users/{first_username}/unfollow/{second_username}")
@@ -98,12 +98,14 @@ def unfollow(
     database: UserRepository = Depends(get_graph_database),
 ):
     try:
-        database.unfollow_user(first_username, second_username)
+        first_user = UserEntity(first_username)
+        second_user = UserEntity(second_username)
+        database.unfollow_user(first_user, second_user)
         return {"detail": f"{first_username} unfollowed {second_username}"}
     except UserNotFound as e:
-        raise HTTPException(status_code=404, detail=f"{e.args[0]}")
+        raise HTTPException(status_code=404, detail=e.args[0])
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"{e}")
+        raise HTTPException(status_code=500, detail=e)
 
 
 if __name__ == "__main__":
