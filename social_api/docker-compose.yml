@@ -11,6 +11,7 @@ services:
       - mysql_container
     networks:
       - social_app_network
+
   neo4j_container:
     image: "neo4j"
     ports:
