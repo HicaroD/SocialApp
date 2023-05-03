@@ -1,7 +1,9 @@
 version: "3.9"
 services:
   api_container:
-    build: .
+    build:
+      context: .
+      dockerfile: API.Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -25,10 +27,15 @@ services:
       - social_app_network
   mysql_container:
     image: "mysql:latest"
+    build:
+      context: .
+      dockerfile: MySQL.Dockerfile
+    restart: always
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: socialapp
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
