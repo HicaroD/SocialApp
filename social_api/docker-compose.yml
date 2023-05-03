@@ -6,11 +6,9 @@ services:
       dockerfile: API.Dockerfile
     ports:
       - "8000:8000"
-    environment:
-      NEO4J_BOLT_URL: bolt://neo4j:hicaropassword@neo4j_container:7687
     depends_on:
       - neo4j_container
-      - mysql_container
+      - postgresql_container
     networks:
       - social_app_network
 
@@ -25,25 +23,22 @@ services:
       - neo4j-data:/data
     networks:
       - social_app_network
-  mysql_container:
-    image: "mysql:latest"
-    build:
-      context: .
-      dockerfile: MySQL.Dockerfile
+
+  postgresql_container:
+    image: postgres
     restart: always
-    ports:
-      - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: socialapp
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgresql-data:/var/lib/postgresql
     networks:
       - social_app_network
 
 volumes:
   neo4j-data:
-  mysql-data:
+  postgresql-data:
 
 
 networks:
