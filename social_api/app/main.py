@@ -38,8 +38,6 @@ def create_user(
         return {"detail": "User created successfully", "user": new_user}
     except UserAlreadyExists as e:
         raise HTTPException(status_code=400, detail=e.args[0])
-    except UserNotFound as e:
-        raise HTTPException(status_code=404, detail=e.args[0])
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 

@@ -75,7 +75,7 @@ class UserDatasource:
         second_user_entity: UserEntity,
     ) -> None:
         first_user = self.get_user(first_user_entity)
-        second_user = self.get_user(first_user_entity)
+        second_user = self.get_user(second_user_entity)
 
         if first_user is None:
             raise UserNotFound(
