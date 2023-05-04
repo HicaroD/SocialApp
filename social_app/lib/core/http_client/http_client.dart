@@ -12,12 +12,7 @@ class HttpClient implements IHttpClient {
   HttpClient({required this.baseUrl});
 
   Uri getUri(String url, {Map<String, dynamic>? queryParameters}) {
-    return Uri(
-      scheme: "https",
-      host: BASE_URL,
-      path: url,
-      queryParameters: {}, // TODO: implement queryParameters (when I need it)
-    );
+    return Uri.parse(BASE_URL + url);
   }
 
   @override
