@@ -1,27 +1,18 @@
-from typing import Generator
+from typing import List
 
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException
 
 from app.schemas.user import User
-from datasources.errors.graph import UserAlreadyExists, UserNotFound
-from datasources.user_datasource import UserDatasource
-from domain.entities.user import UserEntity
-from domain.repositories.user_repository import UserRepository
+from domain.errors.exceptions import UserAlreadyExists, UserNotFound
+from domain.entities.user import User
+from domain.repositories.user_repository_interface import UserRepository
 
 app = FastAPI()
 
 
-def get_graph_database() -> Generator[UserRepository, None, None]:
-    user_datasource = UserDatasource()
-    database = UserRepository(user_datasource)
-    yield database
-
-
-@app.get("/users", response_model=list[str])
-def get_all_registered_users(
-    database: UserRepository = Depends(get_graph_database),
-):
+@app.get("/users", response_model=List[str])
+def get_all_registered_users():
     try:
         return database.get_all_users()
     except Exception as e:
@@ -29,12 +20,9 @@ def get_all_registered_users(
 
 
 @app.post("/users", status_code=201)
-def create_user(
-    user: User,
-    database: UserRepository = Depends(get_graph_database),
-):
+def create_user(user: User):
     try:
-        new_user = database.create_user(UserEntity(user.username))
+        new_user = database.create_user(User(user.username))
         return {"detail": "User created successfully", "user": new_user}
     except UserAlreadyExists as e:
         raise HTTPException(status_code=400, detail=e.message())
@@ -47,24 +35,18 @@ def create_user(
 
 
 @app.get("/users/{username}/following")
-def get_all_following_users(
-    username: str,
-    database: UserRepository = Depends(get_graph_database),
-):
+def get_all_following_users(username: str):
     try:
-        user = UserEntity(username)
+        user = User(username)
         return database.get_all_following_users(user)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
 
-@app.get("/users/{username}/followers")
-def get_all_user_followers(
-    username: str,
-    database: UserRepository = Depends(get_graph_database),
-):
+@app.get("/users/{username}/followers", response_model=List[User])
+def get_all_user_followers(username: str):
     try:
-        user = UserEntity(username)
+        user = User(username)
         return database.get_all_user_followers(user)
     except UserNotFound as e:
         raise HTTPException(status_code=404, detail=e.message())
@@ -76,11 +58,10 @@ def get_all_user_followers(
 def follow(
     first_username: str,
     second_username: str,
-    database: UserRepository = Depends(get_graph_database),
 ):
     try:
-        first_user = UserEntity(first_username)
-        second_user = UserEntity(second_username)
+        first_user = User(first_username)
+        second_user = User(second_username)
         database.follow_user(first_user, second_user)
         return {"detail": f"{first_username} is following {second_username}"}
     except UserNotFound as e:
@@ -93,11 +74,10 @@ def follow(
 def unfollow(
     first_username: str,
     second_username: str,
-    database: UserRepository = Depends(get_graph_database),
 ):
     try:
-        first_user = UserEntity(first_username)
-        second_user = UserEntity(second_username)
+        first_user = User(first_username)
+        second_user = User(second_username)
         database.unfollow_user(first_user, second_user)
         return {"detail": f"{first_username} unfollowed {second_username}"}
     except UserNotFound as e:
