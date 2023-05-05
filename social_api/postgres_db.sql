@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS socialapp;
+CREATE DATABASE socialapp;
