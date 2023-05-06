@@ -1,0 +1,3 @@
+# TODO
+class CommentEntity:
+    pass
