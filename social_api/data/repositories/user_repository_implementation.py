@@ -22,10 +22,13 @@ class UserRepository(IUserRepository):
         self.postgresql_database = postgresql_database
         self.neo4j_database = neo4j_database
 
+    def get_all_users(self) -> List[UserEntity]:
+        return self.postgresql_database.get_all_users()
+
     def create_user(self, user: UserEntity) -> UserEntity:
         user_base_model = self.postgresql_database.create_user(user)
         self.neo4j_database.create_user(user)
-        # return UserModel.from_user_base_model(user_base_model)
+        return user_base_model
 
     def update_user(self, user: UserEntity) -> UserEntity:
         raise NotImplementedError()

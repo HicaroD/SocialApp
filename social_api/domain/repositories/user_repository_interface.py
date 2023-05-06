@@ -7,6 +7,10 @@ from domain.entities.user_entity import UserEntity
 
 class IUserRepository(ABC):
     @abstractmethod
+    def get_all_users(self) -> UserEntity:
+        raise NotImplementedError()
+
+    @abstractmethod
     def create_user(self, user: UserEntity) -> UserEntity:
         raise NotImplementedError()
 
