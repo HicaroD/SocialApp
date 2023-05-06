@@ -23,8 +23,8 @@ class UserRepository(IUserRepository):
         self.neo4j_database = neo4j_database
 
     def create_user(self, user: UserEntity) -> UserEntity:
-        self.neo4j_database.create_user(user)
         user_base_model = self.postgresql_database.create_user(user)
+        self.neo4j_database.create_user(user)
         # return UserModel.from_user_base_model(user_base_model)
 
     def update_user(self, user: UserEntity) -> UserEntity:

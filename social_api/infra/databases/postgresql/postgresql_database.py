@@ -1,4 +1,5 @@
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 from domain.entities.user_entity import UserEntity
 
 from infra.databases.postgresql.config.database_connection import (
@@ -22,7 +23,12 @@ class PostgreSQLDatabase:
         self.session.close()
 
     def create_user(self, user: UserEntity) -> UserBaseModel:
-        with PostgreSQLDatabase() as database:
-            # TODO: add user attributes to UserBaseModel
-            new_user = UserBaseModel()
-            database.session.add()
+        try:
+            with PostgreSQLDatabase() as database:
+                # TODO: add user attributes to UserBaseModel
+                new_user = UserBaseModel()
+                database.session.add()
+                database.session.commit()
+                return new_user
+        except SQLAlchemyError:
+            database.session.rollback()
