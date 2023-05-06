@@ -11,6 +11,10 @@
 - Docker e Docker Compose para criar containers para Neo4J e MySQL.
 - Bash para automatização de comandos do Docker e outros
 
+## Modelo conceitual
+
+![modeloconceitual](./images/modelo_conceitual.png)
+
 ## Contribuidores
 
 - [Hícaro](https://github.com/HicaroD)
