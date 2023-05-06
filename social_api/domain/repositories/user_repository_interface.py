@@ -1,25 +1,25 @@
 from abc import ABC, abstractmethod
 from typing import List
-from domain.entities.comment import Comment
-from domain.entities.post import Post
-from domain.entities.user import User
+from domain.entities.comment_entity import CommentEntity
+from domain.entities.post_entity import PostEntity
+from domain.entities.user_entity import UserEntity
 
 
 class IUserRepository(ABC):
     @abstractmethod
-    def create_user(self, user: User) -> User:
+    def create_user(self, user: UserEntity) -> UserEntity:
         raise NotImplementedError()
 
     @abstractmethod
-    def update_user(self, user: User) -> User:
+    def update_user(self, user: UserEntity) -> UserEntity:
         raise NotImplementedError()
 
     @abstractmethod
-    def delete_user(self, user: User) -> User:
+    def delete_user(self, user: UserEntity) -> UserEntity:
         raise NotImplementedError()
 
     @abstractmethod
-    def get_user_by_username(self, username: str) -> User:
+    def get_user_by_username(self, username: str) -> UserEntity:
         raise NotImplementedError()
 
     @abstractmethod
@@ -31,13 +31,13 @@ class IUserRepository(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_post_from_id(self, post_id: int) -> Post:
+    def get_post_from_id(self, post_id: int) -> PostEntity:
         raise NotImplementedError()
 
     @abstractmethod
-    def get_all_user_followers(self, username: str) -> List[User]:
+    def get_all_user_followers(self, username: str) -> List[UserEntity]:
         raise NotImplementedError()
 
     @abstractmethod
-    def get_comments_from_post(self, post_id: int) -> List[Comment]:
+    def get_comments_from_post(self, post_id: int) -> List[CommentEntity]:
         raise NotImplementedError()

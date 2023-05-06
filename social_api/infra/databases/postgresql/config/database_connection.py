@@ -11,7 +11,6 @@ class DatabaseConnection:
         self._database = "socialapp"
 
         self._connection_string = self._build_connection_string()
-        self.session = None
 
     def get_engine(self):
         return create_engine(self._connection_string)

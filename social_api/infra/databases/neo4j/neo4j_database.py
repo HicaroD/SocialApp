@@ -5,7 +5,7 @@ from neomodel import config
 
 from domain.errors.exceptions import UserAlreadyExists, UserNotFound
 from infra.databases.neo4j.models.user_node_model import UserNodeModel
-from domain.entities.user import User
+from domain.entities.user_entity import UserEntity
 
 load_dotenv(".environment")
 
@@ -14,13 +14,13 @@ class Neo4JDatabase:
     def __init__(self) -> None:
         config.DATABASE_URL = os.getenv("NEO4J_BOLT_URL")
 
-    def get_user(self, user: User) -> UserNodeModel | None:
+    def get_user(self, user: UserEntity) -> UserNodeModel | None:
         return UserNodeModel.nodes.get_or_none(username=user.username)
 
     def get_all_users(self) -> list[str]:
         return [user.username for user in UserNodeModel.nodes.all()]
 
-    def create_user(self, user_entity: User) -> UserNodeModel:
+    def create_user(self, user_entity: UserEntity) -> UserNodeModel:
         user = self.get_user(user_entity)
         if user is not None:
             raise UserAlreadyExists(
@@ -30,7 +30,7 @@ class Neo4JDatabase:
         user = UserNodeModel(username=user_entity.username).save()
         return user
 
-    def get_all_following_users(self, user_entity: User) -> list[str]:
+    def get_all_following_users(self, user_entity: UserEntity) -> list[str]:
         user = self.get_user(user_entity)
         if user is None:
             raise UserNotFound(
@@ -39,7 +39,7 @@ class Neo4JDatabase:
         following_users_of_user = user.get_all_following_users()
         return following_users_of_user
 
-    def get_all_user_followers(self, user_entity: User) -> list[str]:
+    def get_all_user_followers(self, user_entity: UserEntity) -> list[str]:
         user = self.get_user(user_entity)
         if user is None:
             raise UserNotFound(
@@ -51,8 +51,8 @@ class Neo4JDatabase:
     # TODO: avoid code repetition
     def follow_user(
         self,
-        first_user_entity: User,
-        second_user_entity: User,
+        first_user_entity: UserEntity,
+        second_user_entity: UserEntity,
     ) -> None:
         first_user = self.get_user(first_user_entity)
         second_user = self.get_user(second_user_entity)
@@ -71,8 +71,8 @@ class Neo4JDatabase:
 
     def unfollow_user(
         self,
-        first_user_entity: User,
-        second_user_entity: User,
+        first_user_entity: UserEntity,
+        second_user_entity: UserEntity,
     ) -> None:
         first_user = self.get_user(first_user_entity)
         second_user = self.get_user(second_user_entity)
