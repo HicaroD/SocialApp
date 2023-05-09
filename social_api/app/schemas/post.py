@@ -1,13 +1,17 @@
 from pydantic import BaseModel
 
 
-class TextPost(BaseModel):
+class Post(BaseModel):
+    pass
+
+
+class TextPostEntity(Post):
     text: str
 
 
-class VideoPost(BaseModel):
+class VideoPostEntity(Post):
     video: str
 
 
-class PhotoPost(BaseModel):
+class PhotoPost(Post):
     photo: str

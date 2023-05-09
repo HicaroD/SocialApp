@@ -1,4 +1,6 @@
 from typing import List
+from app.schemas.post import TextPostEntity, VideoPostEntity
+from domain.entities.post_entity import PhotoPostEntity, PostEntity
 from domain.entities.user_entity import UserEntity
 from domain.errors.exceptions import UserAlreadyExists
 
@@ -51,3 +53,15 @@ class PostgreSQLDatabase:
             DELETE FROM socialapp_database.users WHERE username = '{username}'
             """
             database.execute_query(query)
+
+    # TODO
+    def post_photo(self, username: str, post: PhotoPostEntity) -> None:
+        raise NotImplementedError()
+
+    # TODO
+    def post_video(self, username: str, post: VideoPostEntity) -> None:
+        raise NotImplementedError()
+
+    # TODO
+    def post_text(self, username: str, post: TextPostEntity) -> None:
+        raise NotImplementedError()

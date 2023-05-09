@@ -1,9 +1,12 @@
 from typing import List
+from pydantic import PostgresDsn
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
+from app.schemas.post import Post
 
 from app.schemas.user import User
+from domain.entities.post_entity import PostEntity
 from domain.errors.exceptions import UserAlreadyExists, UserNotFound
 from domain.entities.user_entity import UserEntity
 from data.repositories.user_repository_implementation import UserRepository
@@ -126,9 +129,12 @@ def unfollow(
         raise HTTPException(status_code=500, detail=e)
 
 
-# TODO: post
+# TODO: do a post (photo, video and text) (three different methods)
+# TODO: get all post from specific user
+# TODO: delete a post
 # TODO: comment in post
-
+# TODO: get all comments from post
+# TODO: get all comments of user in a specific post
 
 if __name__ == "__main__":
     uvicorn.run("main:app", reload=True)
