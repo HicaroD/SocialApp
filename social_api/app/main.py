@@ -20,7 +20,7 @@ user_repository = UserRepository(postgresql_database, neo4j_database)
 def get_all_users():
     try:
         users = user_repository.get_all_users()
-        return users
+        return {"users": users}
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
@@ -38,27 +38,40 @@ def create_user(user: User):
         )
         return {"detail": "User created successfully", "user": user}
     except UserAlreadyExists as e:
-        raise HTTPException(status_code=400, detail=e.message())
+        raise HTTPException(status_code=400, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
 
-# TODO
 @app.put("/users/{username}")
-def update_user(user: User):
+def update_user(username: str, user: User):
     try:
-        # TODO
-        pass
+        user_repository.update_user(
+            username,
+            UserEntity(
+                user.name,
+                user.username,
+                user.email,
+                user.is_verified,
+            ),
+        )
+        return {
+            "detail": "User was successfuly updated",
+            "user": user,
+        }
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
 
-# TODO
 @app.delete("/users/{username}")
 def delete_user(username: str):
     try:
-        # TODO
-        pass
+        user_repository.delete_user(username)
+        return {"detail": f"User with username '{username} was deleted successfuly'"}
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
@@ -66,8 +79,7 @@ def delete_user(username: str):
 @app.get("/users/{username}/following")
 def get_all_following_users(username: str):
     try:
-        user = UserEntity(username)
-        return user_repository.get_all_following_users(user)
+        return user_repository.get_all_following_users(username)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
@@ -75,10 +87,9 @@ def get_all_following_users(username: str):
 @app.get("/users/{username}/followers", response_model=List[User])
 def get_all_user_followers(username: str):
     try:
-        user = UserEntity(username)
-        return user_repository.get_all_user_followers(user)
+        return user_repository.get_all_user_followers(username)
     except UserNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message())
+        raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
@@ -89,12 +100,10 @@ def follow(
     second_username: str,
 ):
     try:
-        first_user = UserEntity(first_username)
-        second_user = UserEntity(second_username)
-        user_repository.follow_user(first_user, second_user)
+        user_repository.follow_user(first_username, second_username)
         return {"detail": f"{first_username} is following {second_username}"}
     except UserNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message())
+        raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
@@ -105,12 +114,10 @@ def unfollow(
     second_username: str,
 ):
     try:
-        first_user = UserEntity(first_username)
-        second_user = UserEntity(second_username)
-        user_repository.unfollow_user(first_user, second_user)
+        user_repository.unfollow_user(first_username, first_username)
         return {"detail": f"{first_username} unfollowed {second_username}"}
     except UserNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message())
+        raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 

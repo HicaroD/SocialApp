@@ -26,23 +26,25 @@ class UserRepository(IUserRepository):
         return self.postgresql_database.get_all_users()
 
     def create_user(self, user: UserEntity) -> UserEntity:
-        # self.neo4j_database.create_user(user)
         self.postgresql_database.create_user(user)
+        self.neo4j_database.create_user(user)
 
-    def update_user(self, user: UserEntity) -> UserEntity:
-        raise NotImplementedError()
+    def update_user(self, username: str, user: UserEntity) -> UserEntity:
+        self.neo4j_database.update_user(username, user)
+        self.postgresql_database.update_user(username, user)
 
-    def delete_user(self, user: UserEntity) -> UserEntity:
-        raise NotImplementedError()
+    def delete_user(self, username: str) -> UserEntity:
+        self.neo4j_database.delete_user(username)
+        self.postgresql_database.delete_user(username)
 
     def get_user_by_username(self, username: str) -> UserEntity:
         raise NotImplementedError()
 
     def follow_user(self, first_username: str, second_username: str) -> None:
-        raise NotImplementedError()
+        self.neo4j_database.follow_user(first_username, second_username)
 
     def unfollow_user(self, first_username: str, second_username: str) -> None:
-        raise NotImplementedError()
+        self.neo4j_database.unfollow_user(first_username, second_username)
 
     def get_post_from_id(self, post_id: int) -> PostEntity:
         raise NotImplementedError()

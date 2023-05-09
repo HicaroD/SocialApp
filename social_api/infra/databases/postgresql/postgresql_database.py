@@ -1,11 +1,13 @@
 from typing import List
 from domain.entities.user_entity import UserEntity
+from domain.errors.exceptions import UserAlreadyExists
 
 from infra.databases.postgresql.config.database_connection import (
     DatabaseConnection,
 )
 
 from infra.databases.postgresql.models.user_model import UserModel
+from psycopg2.errors import UniqueViolation
 
 
 class PostgreSQLDatabase:
@@ -19,12 +21,33 @@ class PostgreSQLDatabase:
             return users
 
     def create_user(self, user: UserEntity) -> UserModel:
-        # TODO: line is too big
+        try:
+            with DatabaseConnection() as database:
+                is_verified = "true" if user.is_verified else "false"
+                query = f"""
+                INSERT INTO socialapp_database.users
+                ("name", username, email, is_verified)
+                VALUES('{user.name}', '{user.username}', '{user.email}', {is_verified});
+                """
+                database.execute_query(query)
+        except UniqueViolation:
+            raise UserAlreadyExists(
+                f"User with username '{user.username} already exists'"
+            )
+
+    def update_user(self, username: str, user: UserEntity) -> None:
         with DatabaseConnection() as database:
             is_verified = "true" if user.is_verified else "false"
             query = f"""
-            INSERT INTO socialapp_database.users
-            ("name", username, email, is_verified)
-            VALUES('{user.name}', '{user.username}', '{user.email}', {is_verified});
+            UPDATE socialapp_database.users
+            SET "name" = '{user.name}', username = '{user.username}', email = '{user.email}', is_verified = {is_verified}
+            WHERE username = '{username}';
+            """
+            database.execute_query(query)
+
+    def delete_user(self, username: str) -> None:
+        with DatabaseConnection() as database:
+            query = f"""
+            DELETE FROM socialapp_database.users WHERE username = '{username}'
             """
             database.execute_query(query)
