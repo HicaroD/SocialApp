@@ -40,6 +40,14 @@ class UserRepository:
     def unfollow_user(self, first_username: str, second_username: str) -> None:
         self.neo4j_database.unfollow_user(first_username, second_username)
 
+    # TODO
+    def post(self):
+        raise NotImplementedError()
+
+    # TODO
+    def comment_in_post(self):
+        raise NotImplementedError()
+
     def get_post_from_id(self, post_id: int) -> PostEntity:
         raise NotImplementedError()
 
