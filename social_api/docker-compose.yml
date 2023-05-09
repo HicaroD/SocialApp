@@ -1,17 +1,5 @@
 version: "3.9"
 services:
-  api_container:
-    build:
-      context: .
-      dockerfile: API.Dockerfile
-    ports:
-      - "8000:8000"
-    depends_on:
-      - neo4j_container
-      - postgresql_container
-    networks:
-      - social_app_network
-
   neo4j_container:
     image: "neo4j"
     ports:
@@ -30,15 +18,27 @@ services:
       dockerfile: DB.Dockerfile
     restart: always
     ports:
-      - "5432:5432"
+      - "5000:5432"
     volumes:
-      - postgresql-data:/var/lib/postgresql
+      - ./pgdata:/var/lib/postgresql/data/
+    networks:
+      - social_app_network
+
+  api_container:
+    build:
+      context: .
+      dockerfile: API.Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgresql_container
+      - neo4j_container
     networks:
       - social_app_network
 
 volumes:
   neo4j-data:
-  postgresql-data:
+  pgdata:
 
 
 networks:
