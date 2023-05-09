@@ -1,49 +1,30 @@
 from typing import List
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import SQLAlchemyError
 from domain.entities.user_entity import UserEntity
 
 from infra.databases.postgresql.config.database_connection import (
     DatabaseConnection,
 )
+
 from infra.databases.postgresql.models.user_model import UserModel
 
 
 class PostgreSQLDatabase:
     def __init__(self) -> None:
-        self.database_connection = DatabaseConnection()
-        self.session = None
+        pass
 
-    def __enter__(self):
-        engine = self.database_connection.get_engine()
-        session_maker = sessionmaker()
-        self.session = session_maker(bind=engine)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.session.close()
-
-    # TODO: I'm repetiting the same try-except, I need to refactor it
     def get_all_users(self) -> List[UserModel]:
-        with PostgreSQLDatabase() as database:
-            try:
-                return database.session.query(UserModel).all()
-            except SQLAlchemyError:
-                database.session.rollback()
+        with DatabaseConnection() as database:
+            database.execute_query("SELECT * FROM socialapp_database.users")
+            users = database.fetch_all_results()
+            return users
 
     def create_user(self, user: UserEntity) -> UserModel:
-        with PostgreSQLDatabase() as database:
-            try:
-                # TODO: pretty sure there is a better way of doing it
-                # without using all those fields
-                new_user = UserModel(
-                    name=user.name,
-                    username=user.username,
-                    email=user.email,
-                    is_verified=user.email,
-                )
-                database.session.add(new_user)
-                database.session.commit()
-                return new_user
-            except SQLAlchemyError:
-                database.session.rollback()
+        # TODO: line is too big
+        with DatabaseConnection() as database:
+            is_verified = "true" if user.is_verified else "false"
+            query = f"""
+            INSERT INTO socialapp_database.users
+            ("name", username, email, is_verified)
+            VALUES('{user.name}', '{user.username}', '{user.email}', {is_verified});
+            """
+            database.execute_query(query)

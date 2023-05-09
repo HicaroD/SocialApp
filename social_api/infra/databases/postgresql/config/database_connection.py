@@ -1,34 +1,44 @@
-import time
-from sqlalchemy import create_engine
-from sqlalchemy.exc import OperationalError
-
-from infra.databases.postgresql.config.base_database import Base
+from typing import List
+import psycopg2
 
 
 class DatabaseConnection:
     def __init__(self) -> None:
         self._user = "postgres"
         self._password = "example"
-        self._host = "localhost"
+        self._host = "postgresql_container"
         self._port = "5432"
         self._database = "postgres"
 
-    def get_engine(self):
-        engine = None
-        while not engine:
-            try:
-                engine = create_engine(self._build_connection_string())
-                print(engine)
-            except OperationalError:
-                print("Database not ready yet, waiting...")
-                time.sleep(1)
-            except Exception as e:
-                print(f"Error: {e}")
-                raise
+        self.connection = None
+        self.cursor = None
 
-        print("PostgreSQL is connected")
-        Base.metadata.create_all(engine)
-        return engine
+    def __enter__(self):
+        self.connection = self._get_connection()
+        self.cursor = self._get_cursor()
+        return self
 
-    def _build_connection_string(self):
-        return f"postgresql+psycopg2://{self._user}:{self._password}@{self._host}:{self._port}/{self._database}"
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cursor.close()
+        self.connection.close()
+
+    def execute_query(self, query: str):
+        self.cursor.execute(query)
+    
+    def fetch_all_results(self) -> List:
+        return self.cursor.fetchall()
+
+    def _get_connection(self):
+        connection = psycopg2.connect(
+            host=self._host,
+            port=self._port,
+            dbname=self._database,
+            user=self._user,
+            password=self._password,
+        )
+        connection.autocommit = True
+        return connection
+
+    def _get_cursor(self):
+        connection = self._get_connection()
+        return connection.cursor()

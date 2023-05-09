@@ -1,11 +1,20 @@
-from sqlalchemy import Boolean, Column, String
-from infra.databases.postgresql.config.base_database import Base
+from typing import List
 
 
-class UserModel(Base):
-    __tablename__ = "users"
+class UserModel:
+    def __init__(
+        self,
+        name: str,
+        username: str,
+        email: str,
+        is_verified: bool,
+    ):
+        self.name = name
+        self.username = username
+        self.email = email
+        self.is_verified = is_verified
 
-    name = Column(String(50), nullable=False)
-    username = Column(String(10), primary_key=True)
-    email = Column(String(30), nullable=False)
-    is_verified = Column(Boolean, nullable=False)
+    # TODO
+    @staticmethod
+    def from_user_list_query(users: List) -> List["UserModel"]:
+        pass
