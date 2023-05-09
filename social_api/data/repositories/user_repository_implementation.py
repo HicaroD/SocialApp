@@ -2,13 +2,12 @@ from typing import List
 from domain.entities.comment_entity import CommentEntity
 from domain.entities.post_entity import PostEntity
 from domain.entities.user_entity import UserEntity
-from domain.repositories.user_repository_interface import IUserRepository
 
 from infra.databases.neo4j.neo4j_database import Neo4JDatabase
 from infra.databases.postgresql.postgresql_database import PostgreSQLDatabase
 
 
-class UserRepository(IUserRepository):
+class UserRepository:
     def __init__(
         self,
         postgresql_database: PostgreSQLDatabase,
@@ -44,8 +43,15 @@ class UserRepository(IUserRepository):
     def get_post_from_id(self, post_id: int) -> PostEntity:
         raise NotImplementedError()
 
+    def get_all_following_users(self, username: str) -> List[UserEntity]:
+        following_user_usernames = self.neo4j_database.get_all_following_users(username)
+        # TODO: Get each user in PostgreSQL database
+        return following_user_usernames
+
     def get_all_user_followers(self, username: str) -> List[UserEntity]:
-        raise NotImplementedError()
+        followers = self.neo4j_database.get_all_user_followers(username)
+        # TODO: Get each user in PostgreSQL database
+        return followers
 
     def get_comments_from_post(self, post_id: int) -> List[CommentEntity]:
         raise NotImplementedError()

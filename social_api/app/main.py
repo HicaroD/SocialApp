@@ -79,7 +79,10 @@ def delete_user(username: str):
 @app.get("/users/{username}/following")
 def get_all_following_users(username: str):
     try:
-        return user_repository.get_all_following_users(username)
+        following_users = user_repository.get_all_following_users(username)
+        return {"users": following_users}
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
@@ -87,7 +90,8 @@ def get_all_following_users(username: str):
 @app.get("/users/{username}/followers", response_model=List[User])
 def get_all_user_followers(username: str):
     try:
-        return user_repository.get_all_user_followers(username)
+        followers = user_repository.get_all_user_followers(username)
+        return {"users": followers}
     except UserNotFound as e:
         raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
@@ -114,7 +118,7 @@ def unfollow(
     second_username: str,
 ):
     try:
-        user_repository.unfollow_user(first_username, first_username)
+        user_repository.unfollow_user(first_username, second_username)
         return {"detail": f"{first_username} unfollowed {second_username}"}
     except UserNotFound as e:
         raise HTTPException(status_code=404, detail=e.message)
