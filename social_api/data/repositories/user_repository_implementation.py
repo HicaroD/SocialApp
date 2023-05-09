@@ -2,13 +2,8 @@ from typing import List
 from domain.entities.comment_entity import CommentEntity
 from domain.entities.post_entity import PostEntity
 from domain.entities.user_entity import UserEntity
-from data.models.comment_model import CommentModel
-from data.models.post_model import PostModel
-from data.models.user_model import UserModel
-from domain.errors.exceptions import UserAlreadyExists
 from domain.repositories.user_repository_interface import IUserRepository
 
-# TODO: accessing something from the external layer
 from infra.databases.neo4j.neo4j_database import Neo4JDatabase
 from infra.databases.postgresql.postgresql_database import PostgreSQLDatabase
 
@@ -25,15 +20,15 @@ class UserRepository(IUserRepository):
     def get_all_users(self) -> List[UserEntity]:
         return self.postgresql_database.get_all_users()
 
-    def create_user(self, user: UserEntity) -> UserEntity:
+    def create_user(self, user: UserEntity):
         self.postgresql_database.create_user(user)
         self.neo4j_database.create_user(user)
 
-    def update_user(self, username: str, user: UserEntity) -> UserEntity:
+    def update_user(self, username: str, user: UserEntity):
         self.neo4j_database.update_user(username, user)
         self.postgresql_database.update_user(username, user)
 
-    def delete_user(self, username: str) -> UserEntity:
+    def delete_user(self, username: str):
         self.neo4j_database.delete_user(username)
         self.postgresql_database.delete_user(username)
 
