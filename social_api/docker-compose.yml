@@ -20,7 +20,7 @@ services:
     ports:
       - "5000:5432"
     volumes:
-      - postgresql-data:/var/lib/postgresql
+      - ./pgdata:/var/lib/postgresql/data/
     networks:
       - social_app_network
 
@@ -38,7 +38,7 @@ services:
 
 volumes:
   neo4j-data:
-  postgresql-data:
+  pgdata:
 
 
 networks:

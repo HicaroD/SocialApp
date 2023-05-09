@@ -20,15 +20,21 @@ class Neo4JDatabase:
     def get_all_users(self) -> list[str]:
         return [user.username for user in UserNodeModel.nodes.all()]
 
-    def create_user(self, user_entity: UserEntity) -> UserNodeModel:
+    def create_user(self, user_entity: UserEntity) -> None:
         user = self.get_user(user_entity)
         if user is not None:
             raise UserAlreadyExists(
                 f"User with username '{user_entity.username}' already exists"
             )
+        UserNodeModel(username=user_entity.username).save()
 
-        user = UserNodeModel(username=user_entity.username).save()
-        return user
+    # TODO
+    def update_user(self, username: str) -> UserNodeModel:
+        pass
+
+    # TODO
+    def delete_user(self, username: str) -> None:
+        pass
 
     def get_all_following_users(self, user_entity: UserEntity) -> list[str]:
         user = self.get_user(user_entity)

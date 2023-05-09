@@ -16,10 +16,11 @@ neo4j_database = Neo4JDatabase()
 user_repository = UserRepository(postgresql_database, neo4j_database)
 
 
-@app.get("/users", response_model=List[User])
+@app.get("/users")
 def get_all_users():
     try:
-        return user_repository.get_all_users()
+        users = user_repository.get_all_users()
+        return users
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
@@ -27,16 +28,39 @@ def get_all_users():
 @app.post("/users", status_code=201)
 def create_user(user: User):
     try:
-        new_user = user_repository.create_user(UserEntity(user.username))
-        return {"detail": "User created successfully", "user": new_user}
+        user_repository.create_user(
+            UserEntity(
+                user.name,
+                user.username,
+                user.email,
+                user.is_verified,
+            )
+        )
+        return {"detail": "User created successfully", "user": user}
     except UserAlreadyExists as e:
         raise HTTPException(status_code=400, detail=e.message())
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
 
-# TODO: update user
-# TODO: delete user
+# TODO
+@app.put("/users/{username}")
+def update_user(user: User):
+    try:
+        # TODO
+        pass
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+# TODO
+@app.delete("/users/{username}")
+def delete_user(username: str):
+    try:
+        # TODO
+        pass
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
 
 
 @app.get("/users/{username}/following")
