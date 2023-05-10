@@ -1,5 +1,5 @@
 from typing import List
-from app.schemas.post import PhotoPost, TextPostEntity, VideoPostEntity
+from app.schemas.post import PhotoPost, TextPost, VideoPost
 from domain.entities.comment_entity import CommentEntity
 from domain.entities.post_entity import PhotoPostEntity, PostEntity
 from domain.entities.user_entity import UserEntity
@@ -41,29 +41,21 @@ class UserRepository:
     def unfollow_user(self, first_username: str, second_username: str) -> None:
         self.neo4j_database.unfollow_user(first_username, second_username)
 
-    # TODO
+    def post_text(self, username: str, text_post: TextPost) -> None:
+        # TODO: Check if user exists before post
+        self.postgresql_database.post_text(username, text_post)
+
+    def post_video(self, username: str, video_post: VideoPost) -> None:
+        # TODO: Check if user exists before post
+        self.postgresql_database.post_video(username, video_post)
+
     def post_photo(self, username: str, photo_post: PhotoPostEntity) -> None:
-        # Check if user exists before post
+        # TODO: Check if user exists before post
         self.postgresql_database.post_photo(username, photo_post)
-        raise NotImplementedError()
-
-    def post_video(self, username: str, photo_post: VideoPostEntity) -> None:
-        # Check if user exists before post
-        self.postgresql_database.post_photo(username, photo_post)
-        raise NotImplementedError()
-
-    def post_text(self, username: str, photo_post: TextPostEntity) -> None:
-        # Check if user exists before post
-        self.postgresql_database.post_photo(username, photo_post)
-        raise NotImplementedError()
-
-    # TODO
-    def get_all_user_comments_from_post(self, username: str, post_id: str) -> List:
-        raise NotImplementedError()
 
     # TODO
     def get_all_posts_from_user(self, username: str) -> List:
-        raise NotImplementedError()
+        return self.postgresql_database.get_all_post_from_user(username)
 
     # TODO
     def get_post_from_id(self, post_id: int) -> PostEntity:
@@ -71,15 +63,20 @@ class UserRepository:
 
     # TODO
     def get_comments_from_post(self, post_id: int) -> List[CommentEntity]:
-        raise NotImplementedError()
+        return self.postgresql_database.get_all_comments_from_post(post_id)
 
     # TODO
-    def delete_post(self, post_id: str) -> None:
-        raise NotImplementedError()
+    def delete_post(self, post_id: int) -> None:
+        self.postgresql_database.delete_post(post_id)
 
     # TODO
-    def comment_in_post(self, post_id: str, comment: CommentEntity) -> None:
-        raise NotImplementedError()
+    def comment_in_post(
+        self,
+        username: str,
+        post_id: int,
+        comment: CommentEntity,
+    ) -> None:
+        self.postgresql_database.comment_in_post(username, post_id, comment)
 
     def get_all_following_users(self, username: str) -> List[UserEntity]:
         following_user_usernames = self.neo4j_database.get_all_following_users(username)

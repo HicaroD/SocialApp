@@ -5,11 +5,11 @@ class Post(BaseModel):
     pass
 
 
-class TextPostEntity(Post):
+class TextPost(Post):
     text: str
 
 
-class VideoPostEntity(Post):
+class VideoPost(Post):
     video: str
 
 
