@@ -1,9 +1,19 @@
 from typing import List
+from pydantic import PostgresDsn
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
+from app.schemas.comment import Comment
+from app.schemas.post import PhotoPost, Post, TextPost, VideoPost
 
 from app.schemas.user import User
+from domain.entities.comment_entity import CommentEntity
+from domain.entities.post_entity import (
+    PhotoPostEntity,
+    PostEntity,
+    TextPostEntity,
+    VideoPostEntity,
+)
 from domain.errors.exceptions import UserAlreadyExists, UserNotFound
 from domain.entities.user_entity import UserEntity
 from data.repositories.user_repository_implementation import UserRepository
@@ -79,7 +89,10 @@ def delete_user(username: str):
 @app.get("/users/{username}/following")
 def get_all_following_users(username: str):
     try:
-        return user_repository.get_all_following_users(username)
+        following_users = user_repository.get_all_following_users(username)
+        return {"users": following_users}
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
@@ -87,7 +100,8 @@ def get_all_following_users(username: str):
 @app.get("/users/{username}/followers", response_model=List[User])
 def get_all_user_followers(username: str):
     try:
-        return user_repository.get_all_user_followers(username)
+        followers = user_repository.get_all_user_followers(username)
+        return {"users": followers}
     except UserNotFound as e:
         raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
@@ -114,10 +128,92 @@ def unfollow(
     second_username: str,
 ):
     try:
-        user_repository.unfollow_user(first_username, first_username)
+        user_repository.unfollow_user(first_username, second_username)
         return {"detail": f"{first_username} unfollowed {second_username}"}
     except UserNotFound as e:
         raise HTTPException(status_code=404, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+@app.post("/users/{username}/post_photo/")
+def post_photo(
+    username: str,
+    photo: PhotoPost,
+):
+    try:
+        user_repository.post_photo(username, PhotoPostEntity(photo.photo))
+        return {"detail": f"Photo was posted by {username}"}
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+@app.post("/users/{username}/post_video/")
+def post_video(
+    username: str,
+    video: VideoPost,
+):
+    try:
+        user_repository.post_video(username, VideoPostEntity(video.video))
+        return {"detail": f"Video was posted by {username}"}
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+@app.post("/users/{username}/post_text/")
+def post_text(
+    username: str,
+    text: TextPost,
+):
+    try:
+        user_repository.post_text(username, TextPostEntity(text.text))
+        return {"detail": f"Text was posted by {username}"}
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+@app.get("/users/{username}/posts")
+def get_all_user_post_ids(username: str):
+    try:
+        posts = user_repository.get_all_posts_from_user(username)
+        return posts
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+@app.delete("/post/{post_id}")
+def delete_post(post_id: int):
+    try:
+        user_repository.delete_post(post_id)
+        return {"detail": f"Post was deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+@app.post("/users/{username}/posts/{post_id}/comment")
+def comment_in_post(username: str, post_id: int, comment: Comment):
+    try:
+        user_repository.comment_in_post(username, post_id, CommentEntity(comment.text))
+        return {"detail": f"{username} commented in the post with id {post_id}"}
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+@app.get("/posts/{post_id}/comment")
+def get_all_comments_from_post(post_id: int):
+    try:
+        comments = user_repository.get_comments_from_post(post_id)
+        return comments
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
