@@ -95,28 +95,6 @@ def delete_user(username: str):
         raise HTTPException(status_code=500, detail=e)
 
 
-@app.get("/users/{username}/following")
-def get_all_following_users(username: str):
-    try:
-        following_users = user_repository.get_all_following_users(username)
-        return {"users": following_users}
-    except UserNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=e)
-
-
-@app.get("/users/{username}/followers", response_model=List[User])
-def get_all_user_followers(username: str):
-    try:
-        followers = user_repository.get_all_user_followers(username)
-        return {"users": followers}
-    except UserNotFound as e:
-        raise HTTPException(status_code=404, detail=e.message)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=e)
-
-
 @app.post("/users/{first_username}/follow/{second_username}")
 def follow(
     first_username: str,
@@ -139,6 +117,28 @@ def unfollow(
     try:
         user_repository.unfollow_user(first_username, second_username)
         return {"detail": f"{first_username} unfollowed {second_username}"}
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+@app.get("/users/{username}/following")
+def get_all_following_users(username: str):
+    try:
+        following_users = user_repository.get_all_following_users(username)
+        return {"users": following_users}
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+@app.get("/users/{username}/followers")
+def get_all_user_followers(username: str):
+    try:
+        followers = user_repository.get_all_user_followers(username)
+        return {"users": followers}
     except UserNotFound as e:
         raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
@@ -198,7 +198,7 @@ def get_all_user_post_ids(username: str):
         raise HTTPException(status_code=500, detail=e)
 
 
-@app.delete("/post/{post_id}")
+@app.delete("/posts/{post_id}")
 def delete_post(post_id: int):
     try:
         user_repository.delete_post(post_id)
@@ -218,7 +218,7 @@ def comment_in_post(username: str, post_id: int, comment: Comment):
         raise HTTPException(status_code=500, detail=e)
 
 
-@app.get("/posts/{post_id}/comment")
+@app.get("/posts/{post_id}/comments")
 def get_all_comments_from_post(post_id: int):
     try:
         comments = user_repository.get_comments_from_post(post_id)

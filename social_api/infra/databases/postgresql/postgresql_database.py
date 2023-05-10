@@ -125,8 +125,9 @@ class PostgreSQLDatabase:
     def get_all_comments_from_post(self, post_id) -> List:
         with DatabaseConnection() as database:
             query = f"""
-            SELECT c.id, c.text
-            FROM socialapp_database.send s
+            SELECT users.username, c.text
+            FROM socialapp_database.users users
+            JOIN socialapp_database.send s ON s.user_username_fk = users.username
             JOIN socialapp_database.comment c ON s.comment_id_fk = c.id
             WHERE s.post_id_fk = {post_id};
             """
