@@ -1,7 +1,7 @@
 from typing import List
 from app.schemas.post import TextPost, VideoPost
 from domain.entities.comment_entity import CommentEntity
-from domain.entities.post_entity import PhotoPostEntity, PostEntity
+from domain.entities.post_entity import PhotoPostEntity
 from domain.entities.user_entity import UserEntity
 from domain.errors.exceptions import UserAlreadyExists
 
@@ -129,6 +129,16 @@ class PostgreSQLDatabase:
             FROM socialapp_database.send s
             JOIN socialapp_database.comment c ON s.comment_id_fk = c.id
             WHERE s.post_id_fk = {post_id};
+            """
+            database.execute_query(query)
+            return database.fetch_all_results()
+
+    def get_user_by_username(self, username: str) -> UserModel:
+        with DatabaseConnection() as database:
+            query = f"""
+            SELECT *
+            FROM socialapp_database.users users
+            WHERE users.username = '{username}';
             """
             database.execute_query(query)
             return database.fetch_all_results()
