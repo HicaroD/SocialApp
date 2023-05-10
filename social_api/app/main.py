@@ -1,16 +1,14 @@
 from typing import List
-from pydantic import PostgresDsn
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from app.schemas.comment import Comment
-from app.schemas.post import PhotoPost, Post, TextPost, VideoPost
+from app.schemas.post import PhotoPost, TextPost, VideoPost
 
 from app.schemas.user import User
 from domain.entities.comment_entity import CommentEntity
 from domain.entities.post_entity import (
     PhotoPostEntity,
-    PostEntity,
     TextPostEntity,
     VideoPostEntity,
 )
@@ -31,6 +29,17 @@ def get_all_users():
     try:
         users = user_repository.get_all_users()
         return {"users": users}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+
+
+@app.get("/users/{username}")
+def get_user(username: str):
+    try:
+        user = user_repository.get_user_by_username(username)
+        return {"user": user}
+    except UserNotFound as e:
+        raise HTTPException(status_code=404, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
 
