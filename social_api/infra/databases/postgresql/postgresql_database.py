@@ -43,7 +43,10 @@ class PostgreSQLDatabase:
             is_verified = "true" if user.is_verified else "false"
             query = f"""
             UPDATE socialapp_database.users
-            SET "name" = '{user.name}', username = '{user.username}', email = '{user.email}', is_verified = {is_verified}
+            SET "name" = '{user.name}', 
+                username = '{user.username}',
+                email = '{user.email}',
+                is_verified = {is_verified}
             WHERE username = '{username}';
             """
             database.execute_query(query)
@@ -67,7 +70,6 @@ class PostgreSQLDatabase:
             """
             database.execute_query(query)
 
-    # TODO
     def post_video(self, username: str, post: VideoPost) -> None:
         with DatabaseConnection() as database:
             # TODO: check if users exists

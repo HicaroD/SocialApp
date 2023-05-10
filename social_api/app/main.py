@@ -1,5 +1,3 @@
-from typing import List
-
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from app.schemas.comment import Comment
